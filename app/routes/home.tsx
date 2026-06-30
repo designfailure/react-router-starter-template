@@ -9,7 +9,12 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export function loader({ context }: Route.LoaderArgs) {
-	return { message: context.cloudflare.env.VALUE_FROM_CLOUDFLARE };
+	const message = context.cloudflare.env.VALUE_FROM_CLOUDFLARE;
+	if (!message) {
+		console.error("Missing VALUE_FROM_CLOUDFLARE binding in Cloudflare environment");
+		throw new Response("Server configuration error", { status: 500 });
+	}
+	return { message };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {

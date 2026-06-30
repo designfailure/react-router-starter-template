@@ -15,9 +15,14 @@ const requestHandler = createRequestHandler(
 );
 
 export default {
-	fetch(request, env, ctx) {
-		return requestHandler(request, {
-			cloudflare: { env, ctx },
-		});
+	async fetch(request, env, ctx) {
+		try {
+			return await requestHandler(request, {
+				cloudflare: { env, ctx },
+			});
+		} catch (error) {
+			console.error("Unhandled error in request handler:", error);
+			return new Response("Internal Server Error", { status: 500 });
+		}
 	},
 } satisfies ExportedHandler<Env>;
