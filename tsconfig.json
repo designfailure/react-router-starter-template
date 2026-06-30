@@ -9,6 +9,9 @@
 		"verbatimModuleSyntax": true,
 		"skipLibCheck": true,
 		"strict": true,
-		"noEmit": true
+		"noEmit": true,
+		"target": "ES2022",
+		"module": "ES2022",
+		"moduleResolution": "bundler"
 	}
 }
