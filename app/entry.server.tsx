@@ -1,6 +1,7 @@
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
+import type { ReactDOMServerReadableStream } from "react-dom/server";
 import { renderToReadableStream } from "react-dom/server";
 
 export default async function handleRequest(
@@ -13,20 +14,31 @@ export default async function handleRequest(
 	let shellRendered = false;
 	const userAgent = request.headers.get("user-agent");
 
-	const body = await renderToReadableStream(
-		<ServerRouter context={routerContext} url={request.url} />,
-		{
-			onError(error: unknown) {
-				responseStatusCode = 500;
-				// Log streaming rendering errors from inside the shell.  Don't log
-				// errors encountered during initial shell rendering since they'll
-				// reject and get logged in handleDocumentRequest.
-				if (shellRendered) {
-					console.error(error);
-				}
+	let body: ReactDOMServerReadableStream;
+	try {
+		body = await renderToReadableStream(
+			<ServerRouter context={routerContext} url={request.url} />,
+			{
+				onError(error: unknown) {
+					responseStatusCode = 500;
+					// Log streaming rendering errors from inside the shell.  Don't log
+					// errors encountered during initial shell rendering since they'll
+					// reject and get logged in handleDocumentRequest.
+					if (shellRendered) {
+						console.error(error);
+					}
+				},
 			},
-		},
-	);
+		);
+	} catch (error) {
+		console.error("Failed to render initial shell:", error);
+		responseStatusCode = 500;
+		responseHeaders.set("Content-Type", "text/html");
+		return new Response("<!DOCTYPE html><html><body><h1>Internal Server Error</h1></body></html>", {
+			headers: responseHeaders,
+			status: responseStatusCode,
+		});
+	}
 	shellRendered = true;
 
 	// Ensure requests from bots and SPA Mode renders wait for all content to load before responding
