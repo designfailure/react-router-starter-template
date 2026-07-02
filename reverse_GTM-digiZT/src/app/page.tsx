@@ -49,7 +49,7 @@ function firstSentence(text: string): string {
 function buildDraftFromBrief(brief: string, current: CampaignDraftState): CampaignDraftState {
   const headline = firstSentence(brief).slice(0, 120);
   const offerMatch = brief.match(/(brezpla[^\s,.!?]*(?:\s+[^\s,.!?]+){0,3}|popust[^\s,.!?]*(?:\s+[^\s,.!?]+){0,3}|cena[^\s,.!?]*(?:\s+[^\s,.!?]+){0,3})/i);
-  const offer = offerMatch?.[0] ?? current.offer ?? "zavarovanje ljubljenčka";
+  const offer = offerMatch?.[0] || current.offer || "zavarovanje ljubljenčka";
   return {
     ...current,
     campaign_name: current.campaign_name || `Brief ${headline.slice(0, 24)}`,

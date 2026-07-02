@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
   FunnelChart as RechartsFunnelChart,
@@ -19,6 +19,10 @@ export function FunnelChart({ result }: FunnelChartProps) {
     result.aggregate.best_persona,
   );
   const selected = result.persona_scores.find((item) => item.persona_id === personaId) ?? result.persona_scores[0];
+
+  useEffect(() => {
+    setPersonaId(result.aggregate.best_persona);
+  }, [result]);
 
   const data = useMemo(
     () => [

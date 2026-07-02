@@ -68,8 +68,7 @@ export const LlmEnrichmentSchema = z
             fit_rationale: z.array(z.string()).optional(),
             risks: z.array(z.string()).optional(),
             recommendations: z.array(z.string()).optional(),
-          })
-          .strict(),
+          }),
       )
       .optional(),
     message_decomposition: z
@@ -88,12 +87,11 @@ export const LlmEnrichmentSchema = z
             priority: z.number().int().positive(),
             change: z.string(),
             expected_impact: z.string(),
-          })
-          .strict(),
+          }),
       )
       .optional(),
     executive_summary_sl: z.array(z.string()).optional(),
   })
-  .strict();
+  ;
 
 export type LlmEnrichment = z.infer<typeof LlmEnrichmentSchema>;

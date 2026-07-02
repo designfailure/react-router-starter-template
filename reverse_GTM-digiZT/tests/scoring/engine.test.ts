@@ -96,5 +96,6 @@ describe('analyzeCampaign', () => {
     expect(pa03?.content_acceptance).toBeLessThan(60);
     expect(pa03?.appeal_index).toBeLessThan(50);
     expect(pa03?.predicted_cvr_pct).toBeGreaterThanOrEqual(0);
+    expect(result.message_decomposition.detected_barriers).toContain('nujnost brez dokazov');
   });
 });

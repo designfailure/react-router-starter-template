@@ -107,8 +107,8 @@ export function analyzeCampaign(campaign: CampaignInput, options: EngineOptions 
   const personasFile = loadPersonas();
   const weights = loadWeights();
   const personaScores = personasFile.personas.map((persona) => {
-    const acceptance = scoreContentAcceptance(campaign, persona);
-    const appeal = scoreAppealIndex(campaign, persona);
+    const acceptance = scoreContentAcceptance(campaign, persona, weights);
+    const appeal = scoreAppealIndex(campaign, persona, weights);
     const ctr = predictCtr(campaign, persona, weights, appeal, acceptance, options.visualMatchSignal);
     const cvr = predictCvr(campaign, persona, weights, ctr);
     const hooks = detectHookSignals(campaign, options.visualMatchSignal);

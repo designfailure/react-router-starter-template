@@ -10,14 +10,47 @@ import { loadPersonas } from "@/lib/config/load-personas";
 
 export const runtime = "nodejs";
 
+const MAX_IMAGE_BASE64_LENGTH = 7_000_000;
+const allowedImageMimeTypes = z.enum(["image/jpeg", "image/png", "image/webp"]);
+
 const requestSchema = z
   .object({
     campaign: CampaignInputSchema,
-    image_base64: z.string().min(1).optional(),
-    image_mime: z.string().min(1).optional(),
+    image_base64: z.string().min(1).max(MAX_IMAGE_BASE64_LENGTH, "Slika je prevelika; največja dovoljena dolžina je približno 7.000.000 znakov.").optional(),
+    image_mime: allowedImageMimeTypes.optional(),
     mode: z.enum(["full", "rules_only"]).optional(),
   })
   .strict();
+
+const requestsByIp = new Map<string, { count: number; windowStartMs: number }>();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
+function getClientIp(request: Request): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0]?.trim() || "unknown";
+  }
+  return request.headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+function isRateLimited(request: Request): boolean {
+  // Best-effort, per-instance limiter; durable shared limiting is future work.
+  const ip = getClientIp(request);
+  const now = Date.now();
+  const entry = requestsByIp.get(ip);
+  if (!entry || now - entry.windowStartMs >= RATE_LIMIT_WINDOW_MS) {
+    requestsByIp.set(ip, { count: 1, windowStartMs: now });
+    return false;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  entry.count += 1;
+  return false;
+}
 
 function mergeAnalysis(base: AnalysisResult, enrichment: Awaited<ReturnType<typeof enrichAnalysis>>): AnalysisResult {
   if (!enrichment) {
@@ -58,6 +91,10 @@ function mergeAnalysis(base: AnalysisResult, enrichment: Awaited<ReturnType<type
 
 export async function POST(request: Request) {
   try {
+    if (isRateLimited(request)) {
+      return NextResponse.json({ error: "Preveč zahtev. Poskusite znova čez minuto." }, { status: 429 });
+    }
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {

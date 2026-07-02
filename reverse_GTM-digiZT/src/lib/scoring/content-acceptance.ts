@@ -1,5 +1,6 @@
 import { clamp } from "./utils";
 import { hasPolicyJargon, relevanceScore } from "./heuristics";
+import type { ScoringWeights } from "@/lib/config/load-weights";
 import type { CampaignInput } from "@/lib/schemas/campaign";
 import type { Persona } from "@/types";
 
@@ -65,6 +66,7 @@ function channelFitScore(persona: Persona, campaign: CampaignInput): number {
 export function scoreContentAcceptance(
   campaign: CampaignInput,
   persona: Persona,
+  weights: ScoringWeights,
 ): ContentAcceptanceResult {
   const pushIntensity = campaign.push_intensity ?? campaign.frequency_cap ?? "medium";
   const details = {
@@ -77,11 +79,11 @@ export function scoreContentAcceptance(
 
   const score =
     100 *
-    (0.25 * details.channelFit +
-      0.2 * details.toneFit +
-      0.15 * details.pushTolerance +
-      0.2 * details.languageClarity +
-      0.2 * details.relevance);
+    (weights.cas_weights.channel_fit * details.channelFit +
+      weights.cas_weights.tone_fit * details.toneFit +
+      weights.cas_weights.push_tolerance * details.pushTolerance +
+      weights.cas_weights.language_clarity * details.languageClarity +
+      weights.cas_weights.relevance * details.relevance);
 
   return {
     score: clamp(score, 0, 100),

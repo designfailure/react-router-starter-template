@@ -5,7 +5,18 @@ const ctaVerbs = ["preveri", "zahtevaj", "kontaktiraj", "naroci", "izracunaj", "
 const vetTrustRoots = ["veterinar", "veterinarska", "veterinarski", "pregled", "klinika", "strokovn"];
 const familyRoots = ["druzin", "otrok", "skupaj", "druzinski", "familij", "partner"];
 const priceRoots = ["cena", "popust", "brezplac", "brezpla", "strosek", "cenov", "ugodno"];
-const proofRoots = ["dokaz", "mnenj", "certifikat", "primerjav", "ocen", "reference", "veterinar", "strokovn"];
+const proofRoots = [
+  "dokaz",
+  "mnenj",
+  "ocen",
+  "certifikat",
+  "referenc",
+  "garancij",
+  "primerjav",
+  "študij",
+  "studij",
+  "raziskav",
+];
 const petHealthRoots = ["ljubljenck", "peth", "zdravj", "nega", "skrb", "bolezn", "veterinar", "druzba"];
 const policyJargonRoots = ["zavarovalna premija", "fransiza", "kritje", "zavarovaln", "odskodn", "odgovornost"];
 
@@ -77,8 +88,10 @@ export function detectHookSignals(campaign: CampaignInput, visualMatchSignal?: n
   });
   const hasFamilyMessaging = countKeywordMatches(familyRoots, copy) > 0;
   const hasPriceMention = countKeywordMatches(priceRoots, copy) > 0;
-  const noProof = countKeywordMatches(proofRoots, copy) === 0;
-  const urgencyWithoutProof = campaign.tone === "urgent" && noProof;
+  const hasProofKeyword = countKeywordMatches(proofRoots, copy) > 0;
+  const hasEvidenceDigits = hasDigits(copy) || copy.includes("%");
+  const noProof = !hasProofKeyword && !hasEvidenceDigits;
+  const urgencyWithoutProof = campaign.tone === "urgent" && noProof && (campaign.trust_signals ?? []).length === 0;
 
   const hooks: string[] = [];
   if (detectFirstSentenceHook(campaign.headline, campaign.primary_text) >= 0.6) {

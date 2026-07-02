@@ -3,6 +3,16 @@ import path from "node:path";
 import yaml from "js-yaml";
 import { z } from "zod";
 
+const formatRatesSchema = z
+  .object({
+    static: z.number().min(0),
+    carousel: z.number().min(0),
+    video: z.number().min(0),
+    story: z.number().min(0),
+    landing_page: z.number().min(0),
+  })
+  .strict();
+
 const weightsSchema = z
   .object({
     version: z.string(),
@@ -23,10 +33,16 @@ const weightsSchema = z
         trust_alignment: z.number().min(0),
       })
       .strict(),
-    base_ctr: z.record(
-      z.enum(["meta", "google", "email", "display", "vet_partnership", "organic"]),
-      z.record(z.enum(["static", "carousel", "video", "story", "landing_page"]), z.number().min(0)),
-    ),
+    base_ctr: z
+      .object({
+        meta: formatRatesSchema,
+        google: formatRatesSchema,
+        email: formatRatesSchema,
+        display: formatRatesSchema,
+        vet_partnership: formatRatesSchema,
+        organic: formatRatesSchema,
+      })
+      .strict(),
     ctr_modifiers: z
       .object({
         headline_hook: z.number().min(0),
