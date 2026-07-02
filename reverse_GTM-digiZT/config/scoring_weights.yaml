@@ -1,0 +1,82 @@
+version: v1
+cas_weights:
+  channel_fit: 0.25
+  tone_fit: 0.2
+  push_tolerance: 0.15
+  language_clarity: 0.2
+  relevance: 0.2
+appeal_weights:
+  goal_alignment: 0.3
+  motivation_match: 0.25
+  concern_resolution: 0.25
+  trust_alignment: 0.2
+base_ctr:
+  meta:
+    static: 0.9
+    carousel: 1.1
+    video: 1.3
+    story: 1.0
+    landing_page: 0.8
+  google:
+    static: 1.6
+    carousel: 1.4
+    video: 1.2
+    story: 1.0
+    landing_page: 2.0
+  email:
+    static: 1.5
+    carousel: 1.5
+    video: 1.6
+    story: 1.2
+    landing_page: 1.4
+  display:
+    static: 0.3
+    carousel: 0.35
+    video: 0.4
+    story: 0.3
+    landing_page: 0.3
+  vet_partnership:
+    static: 2.8
+    carousel: 2.8
+    video: 3.0
+    story: 2.5
+    landing_page: 3.2
+  organic:
+    static: 0.9
+    carousel: 1.0
+    video: 1.2
+    story: 1.0
+    landing_page: 0.9
+ctr_modifiers:
+  headline_hook: 0.15
+  cta_clarity: 0.1
+  visual_audience_match: 0.1
+  offer_specificity: 0.15
+  total_cap: 0.5
+cvr_modifiers:
+  hidden_price:
+    PA-01: 0.6
+    PA-02: 1
+    PA-03: 0.6
+    PA-04: 0.85
+    PA-05: 1
+    PA-06: 1
+  vet_trust:
+    PA-01: 1
+    PA-02: 1
+    PA-03: 1.25
+    PA-04: 1
+    PA-05: 1.25
+    PA-06: 1
+  family_messaging:
+    PA-01: 1
+    PA-02: 1.2
+    PA-03: 1
+    PA-04: 1
+    PA-05: 1
+    PA-06: 1
+  urgency_without_proof_all: 0.7
+  pa03_unsimplified_penalty: 0.3
+verdict_thresholds:
+  strong: 65
+  moderate: 45
